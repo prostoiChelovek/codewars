@@ -15,6 +15,12 @@ fn find_sequences(code: &Vec<u32>) -> HashMap<u32, Vec<u32>> {
         }
         *seq.last_mut().unwrap() += 1;
     }
+
+    for v in sequences.values_mut() {
+        v.sort();
+        v.dedup();
+    }
+
     sequences
 }
 
@@ -46,7 +52,15 @@ mod tests {
     fn find_sequences_two_chars_two_seqs() {
         let seqs = find_sequences(&preprocess_code("0001101111"));
         assert_eq!(seqs.len(), 2);
-        assert_eq!(seqs.get(&0u32), Some(&vec![3u32, 1u32]));
+        assert_eq!(seqs.get(&0u32), Some(&vec![1u32, 3u32]));
         assert_eq!(seqs.get(&1u32), Some(&vec![2u32, 4u32]));
+    }
+
+    #[test]
+    fn find_sequences_no_duplicates() {
+        let seqs = find_sequences(&preprocess_code("11101110"));
+        assert_eq!(seqs.len(), 2);
+        assert_eq!(seqs.get(&0u32), Some(&vec![1u32]));
+        assert_eq!(seqs.get(&1u32), Some(&vec![3u32]));
     }
 }

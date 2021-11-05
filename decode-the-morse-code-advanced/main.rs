@@ -71,16 +71,21 @@ fn detect_samplerate(code: &Vec<u32>) -> u32 {
     0
 }
 
-fn split_alternating(code: &Vec<u32>) -> Vec<Vec<u32>> {
-    let mut last_char: Option<u32> = None;
-    let mut res = Vec::new();
+fn split_alternating<T>(code: &Vec<T>) -> Vec<&[T]>
+where
+    T: std::cmp::PartialEq + Copy,
+{
+    let mut last_char: Option<T> = None;
+    let mut last_end: usize = 0;
+    let mut res: Vec<_> = Vec::new();
 
-    for &c in code {
-        if Some(c) != last_char {
-            res.push(vec![]);
-            last_char = Some(c);
+    for (i, c) in code.iter().cloned().map(Some).chain(std::iter::once(None)).enumerate() {
+        if last_char.is_none() { last_char = c; }
+        if c != last_char {
+            res.push(&code[last_end..i]);
+            last_end = i;
+            last_char = c;
         }
-        res.last_mut().unwrap().push(c);
     }
 
     res

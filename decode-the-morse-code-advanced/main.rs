@@ -90,6 +90,21 @@ where
 
     res
 }
+
+fn fold_sequences<T>(seqs: Vec<&[T]>) -> Vec<(T, usize)>
+where
+    T: std::cmp::PartialEq + Copy,
+{
+    seqs
+        .iter()
+        .map(|seq| {
+            seq
+                .iter()
+                .fold((None, 0usize), |acc, x| (Some(*x), acc.1 + 1))
+        })
+        .map(|x| (x.0.unwrap(), x.1))
+        .collect()
+}
 fn main() {
     println!("Hello, world!");
 }
@@ -148,5 +163,22 @@ mod tests {
     fn split_alternating_multiple_char() {
         assert_eq!(split_alternating(&preprocess_code("1110")), vec![vec![1; 3], vec![0]]);
         assert_eq!(split_alternating(&preprocess_code("00100011")), vec![vec![0; 2], vec![1], vec![0; 3], vec![1; 2]]);
+    }
+
+    #[test]
+    fn fold_sequences_empty() {
+        assert_eq!(fold_sequences(split_alternating(&preprocess_code(""))), vec![]);
+    }
+
+    #[test]
+    fn fold_sequences_single_char() {
+        assert_eq!(fold_sequences(split_alternating(&preprocess_code("111"))), vec![(1, 3)]);
+        assert_eq!(fold_sequences(split_alternating(&preprocess_code("0"))), vec![(0, 1)]);
+    }
+
+    #[test]
+    fn fold_sequences_multiple_char() {
+        assert_eq!(fold_sequences(split_alternating(&preprocess_code("1110"))), vec![(1, 3), (0, 1)]);
+        assert_eq!(fold_sequences(split_alternating(&preprocess_code("00100011"))), vec![(0, 2), (1, 1), (0, 3), (1, 2)]);
     }
 }

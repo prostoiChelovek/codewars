@@ -69,6 +69,8 @@ pub fn decode_bits(encoded: &str) -> String {
             m
         })
         .into_iter()
+        .sorted_by_key(|(k, _)| *k)
+        .rev()
         .max_by_key(|(_, v)| *v)
         .map(|(k, _)| k)
         .unwrap();
@@ -93,6 +95,7 @@ fn decode_morse(encoded: &str) -> String {
 }
 
 fn main() {
+    println!("{:?}", decode_morse(&decode_bits("00111")));
     println!("{:?}", decode_morse(&decode_bits("10111")));
     println!("{:?}", decode_morse(&decode_bits("00001100111111000000000")));
     println!("{:?}", decode_morse(&decode_bits("1100110011001100000011000000111111001100111111001111110000000000000011001111110011111100111111000000110011001111110000001111110011001100000011")));

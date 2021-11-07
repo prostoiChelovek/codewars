@@ -1,16 +1,24 @@
+use itertools::Itertools;
 use std::collections::HashMap;
 
 #[macro_use]
 extern crate lazy_static;
 
 lazy_static! {
-    static ref SYMBOL_ENCODINGS: HashMap<&'static str, (u32, u32)> = {
+    static ref SYMBOL_ENCODINGS: HashMap<char, HashMap<usize, &'static str>> = {
+        let mut m1 = HashMap::new();
+        m1.insert(1, ".");
+        m1.insert(3, "-");
+
+        let mut m0 = HashMap::new();
+        m0.insert(1, "");
+        m0.insert(3, " ");
+        m0.insert(7, "   ");
+
         let mut m = HashMap::new();
-        m.insert(".",   (1, 1));
-        m.insert("-",   (1, 3));
-        m.insert("",    (0, 1));
-        m.insert(" ",   (0, 3));
-        m.insert("   ", (0, 7));
+        m.insert('0', m0);
+        m.insert('1', m1);
+
         m
     };    
 }
@@ -39,6 +47,7 @@ fn find_sequences(code: &Vec<u32>) -> HashMap<u32, Vec<u32>> {
     sequences
 }
 
+/*
 fn detect_samplerate(code: &Vec<u32>) -> u32 {
     let mut single_unit_seqs: HashMap<u32, Vec<u32>> = HashMap::new();
     for &(s, l) in SYMBOL_ENCODINGS.values() {
@@ -70,6 +79,7 @@ fn detect_samplerate(code: &Vec<u32>) -> u32 {
     }
     0
 }
+*/
 
 fn split_alternating<T>(code: &Vec<T>) -> Vec<&[T]>
 where
@@ -105,7 +115,45 @@ where
         .map(|x| (x.0.unwrap(), x.1))
         .collect()
 }
+
+pub fn decode_bits(encoded: &str) -> String {
+    let it = encoded
+        .chars()
+        .map(|c| (c, 1))
+        .coalesce(|a, b| {
+            if a.0 == b.0 { Ok((a.0, a.1 + b.1)) }
+            else { Err((a, b)) }
+        });
+    let samplerate = it
+        .clone()
+        .flat_map(|(c, n)| {
+            SYMBOL_ENCODINGS[&c]
+                .keys()
+                .sorted()
+                .rev()
+                .filter(move |len| n % *len == 0)
+                .map(move |len| n / len)
+                .collect::<Vec<_>>()
+        })
+        .sorted()
+        .fold(HashMap::<usize, usize>::new(), |mut m, x| {
+            *m.entry(x).or_default() += 1;
+            m
+        })
+        .into_iter()
+        .max_by_key(|(_, v)| *v)
+        .map(|(k, _)| k)
+        .unwrap();
+    it
+        .map(|(c, n)| (c, n / samplerate))
+        .map(|(ref c, ref n)| SYMBOL_ENCODINGS[c][n])
+        .collect()
+}
+
 fn main() {
+    decode_bits("10111");
+    decode_bits("1100111111");
+    decode_bits("1100110011001100000011000000111111001100111111001111110000000000000011001111110011111100111111000000110011001111110000001111110011001100000011");
     println!("Hello, world!");
 }
 

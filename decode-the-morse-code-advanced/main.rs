@@ -76,7 +76,11 @@ pub fn decode_bits(encoded: &str) -> String {
         .map(|(c, n)| (c, n / samplerate))
         .filter_map(|(ref c, ref n)| SYMBOL_ENCODINGS.get(c)?.get(n))
         .cloned()
-        .collect::<String>()
+        .collect()
+}
+
+fn decode_morse(encoded: &str) -> String {
+    encoded
         .split("   ")
         .map(|x| {
             x.split(' ')
@@ -89,8 +93,8 @@ pub fn decode_bits(encoded: &str) -> String {
 }
 
 fn main() {
-    println!("{:?}", decode_bits("10111"));
-    println!("{:?}", decode_bits("00001100111111000000000"));
-    println!("{:?}", decode_bits("1100110011001100000011000000111111001100111111001111110000000000000011001111110011111100111111000000110011001111110000001111110011001100000011"));
+    println!("{:?}", decode_morse(&decode_bits("10111")));
+    println!("{:?}", decode_morse(&decode_bits("00001100111111000000000")));
+    println!("{:?}", decode_morse(&decode_bits("1100110011001100000011000000111111001100111111001111110000000000000011001111110011111100111111000000110011001111110000001111110011001100000011")));
 }
 

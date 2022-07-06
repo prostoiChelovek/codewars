@@ -66,3 +66,8 @@ def test_invalid_input():
     assert calculate("2+2p") == "400: Bad request"
     assert calculate("2++2") == "400: Bad request"
     assert calculate("2+2+p") == "400: Bad request"
+
+
+def test_first_neg():
+    assert calculate("-1") == "-1"
+    assert calculate("-5+5*5") == "20"

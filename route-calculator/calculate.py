@@ -27,6 +27,8 @@ def calculate(exp: str) -> str:
     OPERATIONS_BY_PRIORITY = ["$", "*", "-", "+"]
 
     tokens = tokenize(exp)
+    if tokens[0] in "-+":
+        tokens.insert(0, 0)
 
     for i, t in enumerate(tokens):
         if t in OPERATIONS.keys():

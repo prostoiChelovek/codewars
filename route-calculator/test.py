@@ -49,7 +49,20 @@ def test_multiple_with_different_priority():
     assert calculate("5+5*5*2") == "55"
     assert calculate("5-5+5*5*2") == "50"
     assert calculate("1000$2.5$5+5-5+6$6") == "81"
+    assert calculate("5+8-8*2$4") == "9"
 
 
 def test_float():
     assert calculate("4.2+3.14*2") == "10.48"
+
+
+def test_calculate_with_one_number():
+    assert calculate("1") == "1"
+    assert calculate("42") == "42"
+
+
+def test_invalid_input():
+    assert calculate("aaa") == "400: Bad request"
+    assert calculate("2+2p") == "400: Bad request"
+    assert calculate("2++2") == "400: Bad request"
+    assert calculate("2+2+p") == "400: Bad request"

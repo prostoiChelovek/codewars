@@ -1,4 +1,3 @@
-from decimal import Decimal
 from typing import List
 
 
@@ -29,11 +28,20 @@ def calculate(exp: str) -> str:
 
     tokens = tokenize(exp)
 
-    def calc(single_exp: List[str]) -> str:
-        left = Decimal(single_exp[0])
+    for i, t in enumerate(tokens):
+        if t in OPERATIONS.keys():
+            continue
+        else:
+            try:
+                tokens[i] = float(t)
+            except ValueError:
+                return "400: Bad request"
+
+    def calc(single_exp: List[str]) -> float:
+        left = single_exp[0]
         op = OPERATIONS[single_exp[1]]
-        right = Decimal(single_exp[2])
-        return str(op(left, right))
+        right = single_exp[2]
+        return op(left, right)
 
     while len(tokens) > 1:
         present_ops = filter(lambda o: o in tokens, OPERATIONS_BY_PRIORITY)
@@ -44,4 +52,4 @@ def calculate(exp: str) -> str:
         del tokens[single_exp_slice]
         tokens.insert(single_exp_slice.start, res)
 
-    return str(tokens[0])
+    return f"{tokens[0]:g}"
